@@ -18,6 +18,9 @@ import java.util.regex.Matcher
 import java.util.zip.GZIPInputStream
 import java.util.zip.InflaterInputStream
 
+import java.security.MessageDigest
+import javax.xml.bind.DatatypeConverter
+
 import static java.lang.System.currentTimeMillis
 
 class Plugin extends WebResourceUrlExtractor {
@@ -41,6 +44,12 @@ class Plugin extends WebResourceUrlExtractor {
             String value = URLDecoder.decode(it.value, "UTF-8").toLowerCase()
             if (name == "translation") name = "t" // that key used the original plugin
             return [(name): value]}
+    }
+
+    static String getCacheKey(String message) {
+        return DatatypeConverter.printHexBinary(
+            MessageDigest.getInstance("MD5").digest(
+                message.getBytes(StandardCharsets.UTF_8))).toUpperCase()
     }
 
     /**
@@ -201,6 +210,7 @@ class Plugin extends WebResourceUrlExtractor {
             fileType: MediaFileType.VIDEO,
             thumbnailUrl: webResourceItem.additionalInfo.thumbnailUrl,
             contentUrl: contentUrl,
+            cacheKey : getCacheKey(contentUrl),
             userAgent: headers["User-Agent"]
         )
     }
