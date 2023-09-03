@@ -2,24 +2,29 @@
     https://forum.serviio.org/viewtopic.php?t=23717
 */
 import groovy.json.JsonSlurper
+
 import org.apache.commons.io.IOUtils
 import org.apache.http.NameValuePair
 import org.apache.http.client.utils.URLEncodedUtils
 import org.apache.http.message.BasicNameValuePair
+
 import org.serviio.library.metadata.MediaFileType
 import org.serviio.library.online.*
+
 import java.nio.charset.StandardCharsets
+
+import java.util.Base64
 import java.util.regex.Matcher
 import java.util.zip.GZIPInputStream
 import java.util.zip.InflaterInputStream
+
 import static java.lang.System.currentTimeMillis
 
 class Plugin extends WebResourceUrlExtractor {
     static final String hostname = "seasonvar.ru"
     private static final Map<String, String> headers = [
-        "User-Agent": "Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) \
-AppleWebKit/601.1.46 (KHTML, like Gecko) \
-Version/9.0 Mobile/13B143 Safari/601.1",
+        //"User-Agent": "Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
         "Accept": "*/*",
         "Accept-Language": "ru-RU",
     ]
@@ -187,10 +192,15 @@ Version/9.0 Mobile/13B143 Safari/601.1",
      */
     @Override
     protected ContentURLContainer extractUrl(WebResourceItem webResourceItem, PreferredQuality preferredQuality) {
+        // decode url link
+        String contentUrl = webResourceItem.additionalInfo.link
+        contentUrl = contentUrl.replace("#2", "").replaceAll(/(\/\/.*?=)/, "")
+        contentUrl =  new String(Base64.getDecoder().decode(contentUrl), StandardCharsets.UTF_8)
+
         return new ContentURLContainer(
             fileType: MediaFileType.VIDEO,
             thumbnailUrl: webResourceItem.additionalInfo.thumbnailUrl,
-            contentUrl: webResourceItem.additionalInfo.link,
+            contentUrl: contentUrl,
             userAgent: headers["User-Agent"]
         )
     }
