@@ -269,8 +269,12 @@ class IndexPageParser extends PageParser implements IndexPageParserInterface {
     }
 
     protected String parseTitle() {
-        Matcher matcher = match(/(?s)<h1\s+class="pgs-sinfo-title".*?>[\u0410-\u044f]+\s+(.*?)\s+[\u0410-\u044f]+<\/h1>/)
-        return matcher.group(1).replaceAll(/\s+/, " ")
+        try {
+            Matcher matcher = match(/(?s)<h1\s+class="pgs-sinfo-title".*?>[\u0410-\u044f]+\s+(.*?)\s+[\u0410-\u044f]+<\/h1>/)
+            return matcher.group(1).replaceAll(/\s+/, " ")
+        } catch (IllegalStateException ignore) {
+            return "parseTitle error"
+        }
     }
 
     protected String parseCurrentSeasonId() {
@@ -283,23 +287,39 @@ class IndexPageParser extends PageParser implements IndexPageParserInterface {
     }
 
     protected String parseId() {
-        Matcher matcher = match(/data-id-season="(\d+)"/)
-        return matcher.group(1)
+        try {
+            Matcher matcher = match(/data-id-season="(\d+)"/)
+            return matcher.group(1)
+        } catch (IllegalStateException ignore) {
+            return "0"
+        }
     }
 
     protected String parseSerial() {
-        Matcher matcher = match(/data-id-serial="(\d+)"/)
-        return matcher.group(1)
+        try {
+            Matcher matcher = match(/data-id-serial="(\d+)"/)
+            return matcher.group(1)
+        } catch (IllegalStateException ignore) {
+            return "0"
+        }
     }
 
     protected String parseSecure() {
-        Matcher matcher = match(/(?s)data4play.*?'secureMark':\s+'([a-f0-9]+)'/)
-        return matcher.group(1)
+        try {
+            Matcher matcher = match(/(?s)data4play.*?'secureMark':\s+'([a-f0-9]+)'/)
+            return matcher.group(1)
+        } catch (IllegalStateException ignore) {
+            return "0"
+        }
     }
 
     protected String parseTime() {
-        Matcher matcher = match(/(?s)data4play.*?'time':\s+([0-9]+)/)
-        return matcher.group(1)
+        try {
+            Matcher matcher = match(/(?s)data4play.*?'time':\s+'([0-9]+)'/)
+            return matcher.group(1)
+        } catch (IllegalStateException ignore) {
+            return "0"
+        }
     }
 
     protected List<String> parseSeasons() {
